@@ -1,0 +1,57 @@
+trigger JobApplicationTrigger on Job_Application__c (after insert) 
+{
+   
+     JobApplicationTriggerHandlerClass.recordCountUpdate(Trigger.New[0]);
+    
+
+}
+
+
+public class JobApplicationTriggerHandlerClass {
+    
+    public static void recordCountUpdate(Job_Application__c job)
+    {	
+         	 if(job.CandidateNumber__c!=null)
+            {
+                List<AggregateResult>  results=[select CandidateNumber__c,count(Id) totalCount
+                                                from Job_Application__c group by CandidateNumber__c
+                                                having CandidateNumber__c=:job.CandidateNumber__c ];
+                
+                
+                Candidate__c can=[select Total_No_Of_JobApplications__c from Candidate__c where Id=:job.CandidateNumber__c];
+                can.Total_No_Of_JobApplications__c=(Integer)results[0].get('totalCount');
+                update can;
+            }
+    }
+
+}
+
+
+
+@isTest
+private class JobApplicationTriggerHandlerTestClass 
+{
+    
+    @isTest
+    static void validationCount()
+    {
+        Candidate__c can=new Candidate__c(Full_Name__c='Test Candidate',
+                                          Email_Id__c='testcan@gmail.com',
+                                         Phone_Number__c='345634563');
+        insert can;
+        
+        Job_Application__c job=new Job_Application__c(Status__c='New',
+                                                      Approval_Status__c='New',
+                                                     CandidateNumber__c=can.Id);
+        
+        Test.startTest();
+            insert job;
+        Test.stopTest();
+        
+        Candidate__c c=[select Total_No_Of_JobApplications__c from Candidate__c where Id=:can.Id];
+        
+        System.assertEquals(1,c.Total_No_Of_JobApplications__c);
+        
+    }
+
+}
