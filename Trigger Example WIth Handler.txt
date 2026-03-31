@@ -1,0 +1,131 @@
+trigger CandidateTrigger on Candidate__c (before insert,before update, before delete, after insert,after update,after delete,after undelete)
+{
+    
+    if(Trigger.isBefore)
+    {
+        if(Trigger.isInsert || Trigger.isUpdate)
+        {
+           //get details of the current updated/ inserted record
+           //Candidate__c can=Trigger.New[0]; //current Record(Adding/ Updating)
+           CandidateTriggerHandlerClass.validatePhone(Trigger.New[0]);
+        }
+        
+        if(Trigger.isDelete)
+        {
+            CandidateTriggerHandlerClass.validateDelete(Trigger.Old[0]);
+        }
+    }
+    
+    if(Trigger.isAfter)
+    {
+        if(Trigger.isDelete)
+        {
+				CandidateTriggerHandlerClass.sendEmailFunction(Trigger.Old);            
+        }
+        
+        if(Trigger.isUndelete)
+        {
+           CandidateTriggerHandlerClass.sendRestoreEmail(Trigger.New);                    
+        }
+        
+    }
+
+}
+
+
+Handler Class
+
+public class CandidateTriggerHandlerClass 
+{
+    
+    public static void validatePhone(Candidate__c can) //can=Trigger.New[0]
+    {        
+         if(can.Phone_Number__c==null || can.Phone_Number__c=='')
+            {
+                can.Phone_Number__c.addError('Phone Number Cannot be left blank');
+            }
+    }
+    
+    public static void validateDelete(Candidate__c can)
+    {
+        if(can.Mark_For_Delete__c!=True)
+        {
+            can.addError('Cannot Delete '+can.Name+' Record');
+        }
+        else
+        {
+            List<Job_Application__c> jobList=[select Id from Job_Application__c where
+                                              CandidateNumber__c=:can.Id and Status__c!='Rejected'];
+            if(jobList.size()>0)
+            {
+                can.addError('Cannot Delete!! Active Job Application found for '+can.Name);
+            }
+        }
+    }
+    
+    public static void sendEmailFunction(List<Candidate__c> canList)
+    {
+        List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
+
+        for(Candidate__c c:canList)
+        {
+            
+            Messaging.SingleEmailMessage email=new Messaging.SingleEmailMessage();
+            email.setToAddresses(new String[]{c.Email_Id__c});
+            email.setSubject('Record Deleted');
+            email.setPlainTextBody('Hello '+c.Full_Name__c+'\n This is to update that your record deleted succssfully from our Database');
+            	
+            emails.add(email);
+        }
+        
+        if(!emails.isEmpty())
+        {
+            Messaging.sendEmail(emails);
+            System.debug('Emails sent Successfully');
+        }
+        
+    }
+    
+    public static void sendRestoreEmail(List<Candidate__c> canList)
+    {
+        
+          Set<Id> ownerIds = new Set<Id>();
+        for(Candidate__c c:canList)
+        {
+            ownerIds.add(c.OwnerId);
+        }
+        
+         Map<Id, User> ownerMap = new Map<Id, User>(
+            [SELECT Id, Name, Email FROM User 
+             WHERE Id IN :ownerIds]
+        );
+        
+         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
+         for(Candidate__c c:canList)
+        {
+           if(ownerMap.containsKey(c.OwnerId))
+           {
+               User owner=ownerMap.get(c.OwnerId);
+               Messaging.SingleEmailMessage mail=new Messaging.SingleEmailMessage();
+            	mail.setToAddresses(new String[]{owner.Email});
+            	mail.setSubject('Record Restored');
+            	
+                 mail.setPlainTextBody(
+                    'Hello ' + owner.Name + ',\n\n' +
+                    'The Candidate record "' + c.Name + 
+                    '" has been restored from the Recycle Bin.\n\n' +
+                    'Regards,\nSalesforce System'
+                );               
+            emails.add(mail);
+           }
+        }
+        
+          if(!emails.isEmpty())
+        {
+            Messaging.sendEmail(emails);
+            System.debug('Emails sent Successfully');
+        }
+        
+    }
+
+}
