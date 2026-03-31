@@ -1,0 +1,342 @@
+public class MyApex1  //class
+{
+    
+    public static void func15()
+    {
+        //Configure SOSL login in Func15
+        
+        List<List<SObject>> soslSearch=[
+            FIND 'JACK'
+            IN Name Fields
+             RETURNING Contact(Name, Phone),
+                        Account(Name,Phone),
+                       Opportunity(Name,Amount,StageName)
+        ];
+        List<Contact> conList=(List<Contact>)soslSearch[0];
+        List<Account> accList=(List<Account>)soslSearch[1];
+            List<Opportunity> oppList=(List<Opportunity>)soslSearch[2];
+            
+            
+    }
+    
+    
+    
+    public static void func14()
+    {
+        List<AggregateResult>  results=[select StageName,
+                                        count(Id) RecordCount,
+                                        sum(Amount) TotalAmount 
+                                        from Opportunity 
+                                        Group by 
+                                        StageName
+                                        having StageName!='Closed Lost' and sum(Amount)>500000];
+        
+        System.debug(results);
+        for(AggregateResult r:results)
+        {
+            String stage=(String)r.get('StageName');
+            Integer totalCount=(Integer)r.get('RecordCount');
+            Decimal sumAmount=(Decimal)r.get('TotalAmount');
+            System.debug('Stage Name:'+stage);
+            System.debug('Record Count:'+totalCount);
+            System.debug('Total Amount:'+sumAmount);
+            System.debug('');
+        }
+        
+    }
+    
+    
+    
+    
+    public static void func13()
+    {
+        List<Contact> conList=[select FirstName,LastName,Account.Name from Contact];
+        for(Contact c:conList)
+        {
+            System.debug('Contact First Name:'+c.FirstName+',Last Name:'+c.LastName+',Account Name:'+c.Account.Name);
+        }
+    }
+    
+    
+    public static void func12()
+    {
+        //SubQueries
+        
+        List<Account> accList=[select Id,Name,Phone,(Select FirstName,LastName from Contacts) from Account];
+        for(Account a:accList)
+        {
+             System.debug('Account Name:'+a.Name);
+            System.debug('*************************');
+            for(Contact c:a.Contacts)
+            {
+                System.debug('Contact First Name:'+c.FirstName+',Last Name:'+c.LastName);
+            }
+        }
+    }
+    
+    public static void func11()
+    {
+        List<Account> accList=[select Id,Name,Phone from Account];  //1 
+        
+        //SOQL Limitation -- Total we can run 100 SOQL Queries
+        //All Together in 100 Queries we can fetch 50K records
+        
+        for(Account a:accList)
+        {
+            System.debug('Account Name:'+a.Name);
+            System.debug('*************************');
+            List<Contact> conList=[select FirstName,LastName from Contact where AccountId =:a.Id];  //16 Times
+            
+            for(Contact c:conList)
+            {
+                System.debug('Contact First Name:'+c.FirstName+',Last Name:'+c.LastName);
+            }
+        }
+    }
+    
+    
+    
+    public static void func10()
+    {
+        //update candidate record using sObject Data Type
+        
+        List<Candidate__c> can=[select Date_Of_Birth__c from Candidate__c where Id=:'a02gL00000IqFDVQA3'];
+        if(can.size()>0)
+        {
+            //can[0].Date_Of_Birth__c= Date.valueOf('1980-7-3');
+            //update can;
+            delete can;
+            System.debug('Candidate Record Deleted Successfully');
+        }
+        else
+        {
+            System.debug('No Matching Candidate Record Available');
+        }
+        
+    }
+    
+    
+    public static void func9()
+    {
+        //sObject Data Type- Salesforce Object CURD - Create/ Read/ Update/Delete 
+        //DML Commands --> Data Manipulation Language (Create/ Update/ Delete)
+        
+        Candidate__c can=new Candidate__c();
+        can.Full_Name__c='Test Candidate 1';
+        can.Email_Id__c='testcandidate1@gmail.com';
+        can.Phone_Number__c='546456345';
+        insert can;
+        System.debug('Candidate Record Created Successfully with Id:'+can.Id);
+    }
+    
+    public static void func8()
+    {
+        //Create an Account Map to store Id as Key  and complete Record as value
+        
+        List<Account> accList=[select Name,Phone,Type,Industry from Account];
+         Map<Id,Account> accMap=new Map<Id,Account>();
+        
+                //For Each Loop
+      
+      for(Account a:accList)
+      {
+          accMap.put(a.Id,a);
+      }
+      
+        System.debug(accMap.get('001gL00000fFHNVQA4'));
+    }
+    
+    
+    public static void func7()
+    {
+        //Get Record/s from an Object
+        //If we fetch multiple records then use List
+        //if we fetch 1 record then no need to use List
+        //Record--> Collection of Fields
+        //
+        //SOQL--> Salesforce Object Query Language // it is similar to SQL in Database
+        //select * from Stud ---> SQL 
+        //Select * from Account ---> SOQL (Invalid Query)
+        //
+        Account accRecord=[select Id,Name,Phone,Type,Industry from Account where Id=:'001gL00000eG9QAQA0'];
+        System.debug(accRecord);
+        
+        
+        List<Account> accList=[select Name,Phone,Type,Industry from Account];
+        
+        System.debug('Total Records in Account Object ='+accList.size());
+        //System.debug(accList);
+        
+        for(Integer i=0;i<accList.size();i++)
+        {
+            //System.debug('Account Name='+accList[i].Name+', Phone='+accList[i].Phone+', Account Type='+accList[i].Type);
+        }
+        
+
+        
+        
+        //store Account records in a Map using Account Name as Value and Account Id as Key 
+        	
+        Map<String,String> accMap=new Map<String,String>();
+        
+                //For Each Loop
+        for(Account a:accList)
+        {
+            accMap.put(a.Id,a.Name);
+           // System.debug('Account Name='+a.Name+', Phone='+a.Phone+',Type='+a.Type);
+        }
+        
+        System.debug(accMap.keySet());
+        System.debug(accMap.values());
+        		
+        		
+    }
+    
+    
+    
+    
+    public static void func6()
+    {
+        List<String> studName=new List<String>{'Peter','Mike'};
+            
+        List<Integer> studMarks=new List<Integer>{40,50};
+            
+        Map<String,Integer> studInfo=new Map<String,Integer>();
+            
+        for(Integer i=0;i<studName.size();i++)
+        {
+        	//System.debug('Stud Name='+studName[i]+' &  Marks='+studMarks[i]);   
+        	studInfo.put(studName[i],studMarks[i]);                 
+        }
+            
+       //Map to store data
+       
+      
+        //studInfo.put('Peter',40);
+        //studInfo.put('Mike',50);
+        System.debug(studInfo);
+        
+        System.debug(studInfo.get('Peter'));
+        System.debug(studInfo.keySet());
+
+		System.debug(studInfo.values());        
+        
+    }
+    
+    public static void func5()
+    {
+        List<String> empname1=new List<String>{'Peter','Mike','Peter','David','Mike'};
+        Set<String> empName2=new Set<String>{'Peter','Mike','Peter','David','Mike'};
+                
+        System.debug('List='+empName1);
+        System.debug('Set='+empName2);
+        
+    }
+    
+    public static void func4()
+    {
+        List<String> empname=new List<String>{'Peter','Mike'};
+        System.debug(empName);
+        
+        //Add more elements into List
+        empName.add('Susan');
+        
+        System.debug(empName);
+        
+        empName.add(1,'Jack');
+        System.debug(empName);
+        
+      // empName.remove(2);
+       // System.debug(empName);
+        
+      //  empName.clear(); //Remove all Elememnts
+      
+      //  System.debug(empName.size());
+        
+       // System.debug(empName.isEmpty());
+           
+       empName.sort();
+        System.debug(empName);
+    }
+    
+    
+    public static void func3()
+    {
+        String emp1='Peter';
+        String emp2='Mike';
+        String emp3='Susan';
+        String emp4='David';
+        String emp5='James';
+       // System.debug(emp3);  //Susan
+        
+        // create only 1 Variable to store 5 Employee Names
+        // 
+        List<String> empList=new List<String>{'Peter','Mike','Susan','David','James'};
+       
+        
+        //how to use loops in Apex
+        //For Loop
+        
+        for(integer i=0;i<5;i++)
+        {
+            System.debug(empList[i]);
+        }
+        
+        List<Integer> numList=new List<Integer>{10,20,30,40,50,60,70,80,90};
+        
+      // Integer result=numList[0]+numList[1]+numList[2]+numList[3]+numList[4];
+       Integer result=0;
+        
+        for(Integer i=0;i<numList.size();i++)
+        {
+			result=result+numList[i];			            
+        }
+         System.debug('Total='+result);
+        
+    }
+    
+    
+    
+    public static void func2()
+    {
+        Integer num1=10;
+        String language='Apex';
+        Boolean flag=true;
+        Double courseFee=6090.56;
+        Date todayDate=Date.today(); //2026-03-17 00:00:00
+        DateTime currentDt=DateTime.now(); //2026-03-17 15:09:09
+        System.debug('Today Date='+todayDate);
+        System.debug('Current Date Time='+currentDt);
+    }
+    
+    public static String msg()
+    {
+        return 'Hello';
+    }
+    
+    public static integer multiple(integer num1,integer num2)
+    {
+        Integer c=num1*num2;
+        return c;
+        
+    }
+    
+    
+    
+    public static void func1(integer num1,integer num2)  //Empty function
+    {
+        //Data Types in Apex
+        //Primitive Data Types---> Integer,String,Boolean,Double,Date, DateTime
+        //Collecion Data Types -->List, Set, Map
+        //sObject Data Types ---> it will help to Create/Update/Delete/Read Records from an Object
+        //
+        Integer a=num1;
+        Integer b=num2;
+        Integer c=0;
+        c=a+b;
+        System.debug('Addition ='+c);
+        
+        
+    }
+
+}
