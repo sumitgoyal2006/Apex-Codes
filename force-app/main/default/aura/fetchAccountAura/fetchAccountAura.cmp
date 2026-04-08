@@ -1,0 +1,19 @@
+<aura:component controller="LightningApexClass" implements="flexipage:availableForAllPageTypes" access="global" >
+	
+    <aura:attribute name="accountRecords" type="Account[]"></aura:attribute>
+    <aura:attribute name="acccolumns" type="list"></aura:attribute>
+    <aura:handler name="init" value="{!this}" action="{!c.getRecords}"></aura:handler>
+    
+    
+    <lightning:card title="List of Accounts">
+        <div>
+        	 <lightning:datatable
+                keyField="id"
+                data="{!v.accountRecords}"
+                columns="{!v.acccolumns}">
+        </lightning:datatable>
+        </div>
+    
+    </lightning:card>
+    
+</aura:component>

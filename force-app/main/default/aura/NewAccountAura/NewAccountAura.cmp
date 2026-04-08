@@ -1,0 +1,21 @@
+<aura:component   controller="LightningApexClass"   implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	
+    <aura:attribute name="accountName" type="String"></aura:attribute>
+     <aura:attribute name="accountPhone" type="String"></aura:attribute>
+    
+    <lightning:card title="New Account">
+        <div>
+        	<lightning:input label="Enter Account Name"
+                             value="{!v.accountName}">                
+            </lightning:input>
+            
+            <lightning:input label="Enter Account Phone"
+                             value="{!v.accountPhone}">
+            </lightning:input>
+            
+            <lightning:button label="Save" title="Save" onclick="{!c.saveRecord}">
+            </lightning:button>
+        </div>
+    
+    </lightning:card>
+</aura:component>

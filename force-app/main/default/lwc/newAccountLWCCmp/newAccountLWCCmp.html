@@ -1,0 +1,24 @@
+<template>
+    <lightning-card title="New Account LWC" icon-name="standard:account">
+        <div class="slds-p-horizontal_medium">
+            <lightning-input label="Account Name"
+                              value={accName}
+                              onchange={nameChangeHandler}
+                               >
+            </lightning-input>
+
+            <lightning-input label="Phone"
+                            value={accPhone}
+                            onchange={phoneChangeHandler}
+                            >
+        </lightning-input>
+          
+            <lightning-button label="Create Account" 
+                               variant="brand" 
+                               onclick={createAccount}
+                                class="slds-m-top_medium">
+                </lightning-button>
+        </div>
+
+    </lightning-card>
+</template>
