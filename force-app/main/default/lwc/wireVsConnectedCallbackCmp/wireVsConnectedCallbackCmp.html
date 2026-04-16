@@ -1,0 +1,30 @@
+<template>
+    <lightning-card title="Wire vs Connected Callback">
+        <div>
+            <lightning-input label="Enter Account Id" value={accountId}
+                onchange={handleAccountIdChange}>
+
+            </lightning-input>
+        </div>
+        <div class="slds-p-horizontal_medium">
+             <template if:true={accounts}>
+            <div class="slds-p-around_medium">
+                <lightning-datatable
+                    key-field="Id"
+                    data={accounts}
+                    columns={accountColumns}
+                    hide-checkbox-column>
+                </lightning-datatable>
+            </div>
+        </template>
+
+        <!-- No Records Message -->
+        <template if:false={accounts}>
+            <div class="slds-p-around_medium slds-text-color_error">
+                No Records Found
+            </div>
+        </template>
+        </div>
+    </lightning-card>
+    
+</template>

@@ -1,4 +1,4 @@
-import { LightningElement ,api,track} from 'lwc';
+import { LightningElement ,api,wire,track} from 'lwc';
 import getRelatedContact  from '@salesforce/apex/LightningApexClass.getRelatedContact';
 
 export default class RelatedRecordLWC extends LightningElement {

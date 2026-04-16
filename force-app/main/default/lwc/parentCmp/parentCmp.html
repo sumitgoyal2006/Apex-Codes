@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Parent Component">
+        <div class="slds-m-around_medium">
+           <lightning-input label="Enter Message"
+                       value={msgtochild}
+                       onchange={handleMessageChange}></lightning-input>
+            
+        </div>   
+         <div class="slds-m-around_medium">
+           <p>Message from Child:{msgfromchild}</p>
+        </div>       
+    </lightning-card>
+
+    <!--Embed Child Component inside Parent Component-->
+   <c-child-cmp  onchildmsg={handleChildMessage} msgfromparent={msgtochild}></c-child-cmp>
+
+</template>

@@ -1,6 +1,17 @@
 public class LightningApexClass 
 {
 
+
+    //apex function to fetch account details based on account Id
+    @AuraEnabled(cacheable=true)
+    public static Account getAccountDetails(string accId)
+    {
+        Account acc=[select Name,Phone,Type from Account where Id=:accId];
+        return acc;
+    }
+
+
+
     //Apex Function to Fetch Related Contact based on Account Id
         @AuraEnabled(cacheable=true)
     public static List<Contact> getRelatedContact(string accId)
