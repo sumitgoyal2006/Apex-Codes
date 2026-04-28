@@ -38,7 +38,7 @@ public class LightningApexClass
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccount()
     {
-        List<Account> accList=[select Name,Phone,Type from  Account];
+        List<Account> accList=[select Id,Name,Phone,Type from  Account];
         return accList;
     }
 

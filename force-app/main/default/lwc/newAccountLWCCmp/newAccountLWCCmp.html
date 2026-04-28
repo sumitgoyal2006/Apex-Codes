@@ -3,12 +3,14 @@
         <div class="slds-p-horizontal_medium">
             <lightning-input label="Account Name"
                               value={accName}
-                              onchange={nameChangeHandler}
+                              data-id="accName"
+                              onchange={nameChangeHandler}                             
                                >
             </lightning-input>
 
             <lightning-input label="Phone"
                             value={accPhone}
+                            data-id="accPhone"
                             onchange={phoneChangeHandler}
                             >
         </lightning-input>

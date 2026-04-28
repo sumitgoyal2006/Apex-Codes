@@ -10,17 +10,67 @@ export default class NewAccountLWCCmp extends LightningElement {
 
     nameChangeHandler(event)
     {
-        this.accName=event.target.value;
+        this.accName=event.target.value;   
+        if(this.accName==''||this.accName==null) 
+        {
+            event.target.setCustomValidity('Account Name cannot be blank');
+        }
+        else
+        {
+            event.target.setCustomValidity('');
+        }
+        event.target.reportValidity();
     }
 
     phoneChangeHandler(event)
     {
         this.accPhone=event.target.value;
+        if(this.accPhone==''||this.accPhone==null)
+        {
+            event.target.setCustomValidity('Phone Number cannot be blank');
+        }
+        else if(isNaN(this.accPhone))
+        {
+            event.target.setCustomValidity('Phone Number must be numeric');
+        }
+        else
+        {
+            event.target.setCustomValidity('');
+        }
+        event.target.reportValidity();
+      
     }
 
     createAccount()
     {
-        addAccount({
+        //write a logic for custom validation on account name and phone number
+     /*  
+
+       
+        inputs.forEach(input=>{
+            let value=input.value;
+            if(!value||value.trim()=='')
+            {
+                input.setCustomValidity(`${input.label} Cannot be blank`);
+                isValid=false;
+            }
+           input.reportValidity();
+        }); */
+            
+         let isValid=true;
+          const inputs=this.template.querySelectorAll('lightning-input');
+
+            inputs.forEach(input=>{
+                if(!input.checkValidity())
+                {
+                    input.reportValidity();
+                    isValid=false;
+                }
+            });
+
+            if(isValid)
+            {
+                         addAccount({
                     accName:this.accName,
                     accPhone:this.accPhone})
                     .then(result=>{
@@ -40,7 +90,12 @@ export default class NewAccountLWCCmp extends LightningElement {
                         variant:'error'
                        });
                        this.dispatchEvent(evt);
-                    });
+                    });    
+      
+            }
+
+
+          
     }
 
 }

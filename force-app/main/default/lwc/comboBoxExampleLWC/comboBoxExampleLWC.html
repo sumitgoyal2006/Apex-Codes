@@ -1,0 +1,17 @@
+<template>
+    <lightning-card title="Combo Box Example">
+       <lightning-combobox name="AccountName"
+                    label="Account Name"
+                    value={value}
+                    placeholder="Select An Account"
+                    options={optionArray}
+                    onchange={optionChangeHandler}>
+       </lightning-combobox>
+       <div>
+            <p>Id for Selected Account: {value}</p>
+       </div>
+    </lightning-card>
+
+    <c-related-contact-lwc accountid={value}></c-related-contact-lwc>
+    
+</template>
