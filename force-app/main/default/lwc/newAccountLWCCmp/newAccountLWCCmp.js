@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import addAccount from '@salesforce/apex/LightningApexClass.addAccount';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
+import LightningConfirm from 'lightning/confirm';
 
 export default class NewAccountLWCCmp extends LightningElement {
     //properties and methods for the component will go here
@@ -70,7 +71,34 @@ export default class NewAccountLWCCmp extends LightningElement {
 
             if(isValid)
             {
-                         addAccount({
+                   this.openConfirmationBox();
+            }
+
+
+          
+    }
+
+    //function to open async confirmation box
+
+    async openConfirmationBox()
+    {
+        const result=await LightningConfirm.open({
+            message:'Are you sure you want to create a new Account?',
+            variant:'default',
+            label:'Confirmation'
+        });
+        if(result)
+        {
+            this.createRecordFunction();
+        }
+        else
+        { 
+        }
+    }
+
+    createRecordFunction()
+    {
+             addAccount({
                     accName:this.accName,
                     accPhone:this.accPhone})
                     .then(result=>{
@@ -92,10 +120,6 @@ export default class NewAccountLWCCmp extends LightningElement {
                        this.dispatchEvent(evt);
                     });    
       
-            }
-
-
-          
     }
 
 }

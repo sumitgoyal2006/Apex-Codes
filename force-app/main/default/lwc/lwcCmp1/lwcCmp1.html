@@ -1,0 +1,13 @@
+<template>
+    <lightning-card title="Lwc Cmp1">
+        <div>
+            <lightning-input label="Enter name" value={yourname} onchange={handleNameChange}></lightning-input>
+            <lightning-input label="Enter Phone" value={yourphone} onchange={handlePhoneChange}></lightning-input>
+            <lightning-input label="Enter Email" value={youremail} onchange={handleEmailChange}></lightning-input>
+        </div>
+    </lightning-card>
+    
+   <!-- <c-lwc-cmp2 lwc1name={yourname} lwc1phone={yourphone} lwc1email={youremail}></c-lwc-cmp2>--> 
+
+   <c-lwc-cmp2 lwc:spread={empdata}></c-lwc-cmp2>
+</template>
